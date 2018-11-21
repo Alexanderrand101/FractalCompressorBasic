@@ -4,6 +4,7 @@
 #include "stdafx.h"
 #include <fstream>
 #include <iostream>
+#include <iomanip>
 #include <Windows.h>
 #include <math.h>
 
@@ -353,8 +354,12 @@ void calcCoeffs(byte** block, byte**  pixels, int offsetX, int offsetY, int n, f
 		for (int j = 0; j < n; j++)
 		{
 			a += (block[i][j] - daverage)*(pixels[offsetY + i][offsetX + j] - paverage);
-			b += (block[i][j] - paverage)*(block[i][j] - daverage);
+			b += (block[i][j] - daverage)*(block[i][j] - daverage);
 		}
+	}
+	if (a - 0.001 < 0 && b - 0.001 < 0) {
+		a = 1;
+		b = 1;
 	}
 	*contrastCoefficient = a / b;
 	*brightDiffValue = (paverage - (a / b)*daverage);
@@ -417,6 +422,7 @@ void fractalCompressionStep3(byte** pixels, int offsetx, int offsety, int blocks
 	float brightnessDifference = 0;
 	byte affineTransform = 0;
 	float contrastCoefficient = 0;
+	bool found = false;
 	for (int offsetxl = 0; offsetxl + 2 * blocksize <= sizex; offsetxl += blocksize)
 	{
 		for (int offsetyl = 0; offsetyl + 2 * blocksize <= sizey; offsetyl += blocksize)
@@ -732,9 +738,10 @@ void fractalDecompressionStep3(byte** pixels, COMPRESSEDBLOCKCODE** blockCodes, 
 	{
 		tPixels[i] = (float*)calloc(sizex, sizeof(float));
 	}
-	for (int i = 0; i < sizex; i++)
-		for (int j = 0; j < sizey / 2; j++)
-			tPixels[i][j] = 255;
+	//for (int i = 0; i < sizex; i++)
+	//	for (int j = 0; j < sizey; j++) {
+	//		tPixels[i][j] = 255;
+	//	}
 	for (int iteration = 0; iteration < 100; iteration++)
 	{
 		for (int i = 0; i < blockCount; i++)
@@ -774,6 +781,22 @@ void fractalDecompressionStep3(byte** pixels, COMPRESSEDBLOCKCODE** blockCodes, 
 	pixelfromfloat(pixels, tPixels, sizex, sizey);
 }
 
+void print_matr(byte** matr, int n) {
+	for (int i = 0; i < n; i++) {
+		for (int j = 0; j < n; j++)
+			std::cout << std::setw(3) << (int)matr[i][j];
+		std::cout << '\n';
+	}
+}
+
+int blocksum(byte** block, int n) {
+	int sum = 0;
+	for (int i = 0; i < n; i++)
+		for (int j = 0; j < n; j++)
+			sum += block[i][j];
+	return sum;
+}
+
 int main()
 {
 	BITMAPFILEHEADER* fheader = nullptr;
@@ -782,7 +805,7 @@ int main()
 	iheader = (BITMAPINFOHEADER*)malloc(sizeof(BITMAPINFOHEADER));
 	byte** pixels = nullptr;
 	byte*** reftopixels = &pixels;
-	LoadPixels("t2.bmp", reftopixels, fheader, iheader);
+	LoadPixels("t3.bmp", reftopixels, fheader, iheader);
 	byte **blue, **red, **green;
 	blue = (byte**)malloc(sizeof(byte*) * iheader->biHeight);
 	red = (byte**)malloc(sizeof(byte*) * iheader->biHeight);
@@ -795,11 +818,14 @@ int main()
 	}
 	colorChannelSeparator(pixels, blue, green, red, iheader->biWidth, iheader->biHeight);
 	colorChannelCombinator(pixels, blue, blue, blue, iheader->biWidth, iheader->biHeight);
-	SavePixels("r256b11.bmp", pixels, fheader, iheader);
+	SavePixels("r128b11.bmp", pixels, fheader, iheader);
+	std::cout << "blue channel total: " << blocksum(blue, iheader->biHeight) << '\n';
 	colorChannelCombinator(pixels, green, green, green, iheader->biWidth, iheader->biHeight);
-	SavePixels("r256g11.bmp", pixels, fheader, iheader);
+	SavePixels("r128g11.bmp", pixels, fheader, iheader);
+	std::cout << "green channel total: " << blocksum(green, iheader->biHeight) << '\n';
 	colorChannelCombinator(pixels, red, red, red, iheader->biWidth, iheader->biHeight);
-	SavePixels("r256r11.bmp", pixels, fheader, iheader);
+	SavePixels("r128r11.bmp", pixels, fheader, iheader);
+	std::cout << "red channel total " << blocksum(red, iheader->biHeight) << '\n';
 	HEADEROFFCOMFILE* cheader = (HEADEROFFCOMFILE*)malloc(sizeof(HEADEROFFCOMFILE));
 	COMPRESSEDBLOCKCODE** blueCode = (COMPRESSEDBLOCKCODE**)malloc(sizeof(COMPRESSEDBLOCKCODE*)*4096);
 	COMPRESSEDBLOCKCODE** greenCode = (COMPRESSEDBLOCKCODE**)malloc(sizeof(COMPRESSEDBLOCKCODE*)* 4096);
@@ -809,34 +835,34 @@ int main()
 	int redblocks = 0;
 	int greenblocks = 0;
 	////blue
-	//fractalCompressionStep3(blue, 0, 0, initialBlockSize, &blueblocks, blueCode, iheader->biWidth, iheader->biHeight, 100);
-	//fractalCompressionStep3(blue, 0, initialBlockSize, initialBlockSize, &blueblocks, blueCode, iheader->biWidth, iheader->biHeight, 100);
-	//fractalCompressionStep3(blue, initialBlockSize, 0, initialBlockSize, &blueblocks, blueCode, iheader->biWidth, iheader->biHeight, 100);
-	//fractalCompressionStep3(blue, initialBlockSize, initialBlockSize, initialBlockSize, &blueblocks, blueCode, iheader->biWidth, iheader->biHeight, 100);
-	////red
-	//fractalCompressionStep3(red, 0, 0, initialBlockSize, &redblocks, redCode, iheader->biWidth, iheader->biHeight, 10);
-	//fractalCompressionStep3(red, 0, initialBlockSize, initialBlockSize, &redblocks, redCode, iheader->biWidth, iheader->biHeight, 10);
-	//fractalCompressionStep3(red, initialBlockSize, 0, initialBlockSize, &redblocks, redCode, iheader->biWidth, iheader->biHeight, 10);
-	//fractalCompressionStep3(red, initialBlockSize, initialBlockSize, initialBlockSize, &redblocks, redCode, iheader->biWidth, iheader->biHeight, 10);
-	////green
-	//fractalCompressionStep3(green, 0, 0, initialBlockSize, &greenblocks, greenCode, iheader->biWidth, iheader->biHeight, 100);
-	//fractalCompressionStep3(green, 0, initialBlockSize, initialBlockSize, &greenblocks, greenCode, iheader->biWidth, iheader->biHeight, 100);
-	//fractalCompressionStep3(green, initialBlockSize, 0, initialBlockSize, &greenblocks, greenCode, iheader->biWidth, iheader->biHeight, 100);
-	//fractalCompressionStep3(green, initialBlockSize, initialBlockSize, initialBlockSize, &greenblocks, greenCode, iheader->biWidth, iheader->biHeight, 100);
-	//cheader->blueDomainCount = blueblocks;
-	//cheader->greenDomainCount = greenblocks;
-	//cheader->redDomainCount = redblocks;
-	//SaveCompressed("fcompressed256_1.frc", fheader, iheader, cheader, blueCode, redCode, greenCode);
-	//free(fheader);
-	//free2Dimensions(pixels, iheader->biHeight);
-	//free2Dimensions(blue, iheader->biHeight);
-	//free2Dimensions(red, iheader->biHeight);
-	//free2Dimensions(green, iheader->biHeight);
-	//free(iheader);
-	//free2Dimensions((byte**)blueCode, cheader->blueDomainCount);
-	//free2Dimensions((byte**)redCode, cheader->redDomainCount);
-	//free2Dimensions((byte**)greenCode, cheader->greenDomainCount);
-	//free(cheader);
+	fractalCompressionStep3(blue, 0, 0, initialBlockSize, &blueblocks, blueCode, iheader->biWidth, iheader->biHeight, 50);
+	fractalCompressionStep3(blue, 0, initialBlockSize, initialBlockSize, &blueblocks, blueCode, iheader->biWidth, iheader->biHeight, 50);
+	fractalCompressionStep3(blue, initialBlockSize, 0, initialBlockSize, &blueblocks, blueCode, iheader->biWidth, iheader->biHeight, 50);
+	fractalCompressionStep3(blue, initialBlockSize, initialBlockSize, initialBlockSize, &blueblocks, blueCode, iheader->biWidth, iheader->biHeight, 50);
+	//red
+	fractalCompressionStep3(red, 0, 0, initialBlockSize, &redblocks, redCode, iheader->biWidth, iheader->biHeight, 50);
+	fractalCompressionStep3(red, 0, initialBlockSize, initialBlockSize, &redblocks, redCode, iheader->biWidth, iheader->biHeight, 50);
+	fractalCompressionStep3(red, initialBlockSize, 0, initialBlockSize, &redblocks, redCode, iheader->biWidth, iheader->biHeight, 50);
+	fractalCompressionStep3(red, initialBlockSize, initialBlockSize, initialBlockSize, &redblocks, redCode, iheader->biWidth, iheader->biHeight, 50);
+	//green
+	fractalCompressionStep3(green, 0, 0, initialBlockSize, &greenblocks, greenCode, iheader->biWidth, iheader->biHeight, 50);
+	fractalCompressionStep3(green, 0, initialBlockSize, initialBlockSize, &greenblocks, greenCode, iheader->biWidth, iheader->biHeight, 50);
+	fractalCompressionStep3(green, initialBlockSize, 0, initialBlockSize, &greenblocks, greenCode, iheader->biWidth, iheader->biHeight, 50);
+	fractalCompressionStep3(green, initialBlockSize, initialBlockSize, initialBlockSize, &greenblocks, greenCode, iheader->biWidth, iheader->biHeight, 50);
+	cheader->blueDomainCount = blueblocks;
+	cheader->greenDomainCount = greenblocks;
+	cheader->redDomainCount = redblocks;
+	SaveCompressed("fcompressed128_1.frc", fheader, iheader, cheader, blueCode, redCode, greenCode);
+	free(fheader);
+	free2Dimensions(pixels, iheader->biHeight);
+	free2Dimensions(blue, iheader->biHeight);
+	free2Dimensions(red, iheader->biHeight);
+	free2Dimensions(green, iheader->biHeight);
+	free(iheader);
+	free2Dimensions((byte**)blueCode, cheader->blueDomainCount);
+	free2Dimensions((byte**)redCode, cheader->redDomainCount);
+	free2Dimensions((byte**)greenCode, cheader->greenDomainCount);
+	free(cheader);
 	//endofcompression
 
 	//startofdecompression
@@ -846,7 +872,7 @@ int main()
 	COMPRESSEDBLOCKCODE*** ptoblueCode = (COMPRESSEDBLOCKCODE***)malloc(sizeof(COMPRESSEDBLOCKCODE**));
 	COMPRESSEDBLOCKCODE*** ptoredCode = (COMPRESSEDBLOCKCODE***)malloc(sizeof(COMPRESSEDBLOCKCODE**));
 	COMPRESSEDBLOCKCODE*** ptogreenCode = (COMPRESSEDBLOCKCODE***)malloc(sizeof(COMPRESSEDBLOCKCODE**));
-	LoadCompressed("fcompressed256_1.frc", fheader, iheader, cheader, ptoblueCode, ptoredCode, ptogreenCode);
+	LoadCompressed("fcompressed128_1.frc", fheader, iheader, cheader, ptoblueCode, ptoredCode, ptogreenCode);
 	byte** bluePixels = (byte**)malloc(sizeof(byte*)*iheader->biHeight);
 	byte** redPixels = (byte**)malloc(sizeof(byte*)*iheader->biHeight);
 	byte** greenPixels = (byte**)malloc(sizeof(byte*)*iheader->biHeight);
@@ -865,17 +891,22 @@ int main()
 		pixels[i] = (byte*)malloc(sizeof(byte)* iheader->biSizeImage / iheader->biHeight);
 	}
 	colorChannelCombinator(pixels, bluePixels, greenPixels, redPixels, iheader->biWidth, iheader->biHeight);
-	SavePixels("r256_11.bmp", pixels, fheader, iheader);
+	SavePixels("r128_11.bmp", pixels, fheader, iheader);
+	std::cout << "blue channel total2: " << blocksum(bluePixels, iheader->biHeight) << '\n';
 	colorChannelCombinator(pixels, bluePixels, bluePixels, bluePixels, iheader->biWidth, iheader->biHeight);
-	SavePixels("r256b121.bmp", pixels, fheader, iheader);
+	SavePixels("r128b121.bmp", pixels, fheader, iheader);
+	std::cout << "green channel total2: " << blocksum(greenPixels, iheader->biHeight) << '\n';
 	colorChannelCombinator(pixels, greenPixels, greenPixels, greenPixels, iheader->biWidth, iheader->biHeight);
-	SavePixels("r256g121.bmp", pixels, fheader, iheader);
+	SavePixels("r128g121.bmp", pixels, fheader, iheader);
+	std::cout << "red channel total2: " << blocksum(redPixels, iheader->biHeight) << '\n';
 	colorChannelCombinator(pixels, redPixels, redPixels, redPixels, iheader->biWidth, iheader->biHeight);
-	SavePixels("r256r121.bmp", pixels, fheader, iheader);
+	SavePixels("r128r121.bmp", pixels, fheader, iheader);
 	free2Dimensions(pixels, iheader->biHeight);
 	free2Dimensions(bluePixels, iheader->biHeight);
 	free2Dimensions(greenPixels, iheader->biHeight);
 	free2Dimensions(redPixels, iheader->biHeight);
+	int x;
+	std::cin >> x;
     return 0;
 }
 
