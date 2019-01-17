@@ -1,14 +1,14 @@
 ﻿  FractalCompressorBasic.cpp
 g:\fcom\fractalcompressorbasic\fractalcompressorbasic\fractalcompressorbasic.cpp(16): warning C4091: 'typedef ': ignored on left of 'HEADEROFFCOMFILE' when no variable is declared
 g:\fcom\fractalcompressorbasic\fractalcompressorbasic\fractalcompressorbasic.cpp(28): warning C4091: 'typedef ': ignored on left of 'COMPRESSEDBLOCKCODE' when no variable is declared
-g:\fcom\fractalcompressorbasic\fractalcompressorbasic\fractalcompressorbasic.cpp(725): warning C4244: '=': conversion from 'float' to 'byte', possible loss of data
-g:\fcom\fractalcompressorbasic\fractalcompressorbasic\fractalcompressorbasic.cpp(757): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
-g:\fcom\fractalcompressorbasic\fractalcompressorbasic\fractalcompressorbasic.cpp(759): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
-g:\fcom\fractalcompressorbasic\fractalcompressorbasic\fractalcompressorbasic.cpp(761): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
-g:\fcom\fractalcompressorbasic\fractalcompressorbasic\fractalcompressorbasic.cpp(763): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
-g:\fcom\fractalcompressorbasic\fractalcompressorbasic\fractalcompressorbasic.cpp(765): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
-g:\fcom\fractalcompressorbasic\fractalcompressorbasic\fractalcompressorbasic.cpp(767): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
-g:\fcom\fractalcompressorbasic\fractalcompressorbasic\fractalcompressorbasic.cpp(769): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
-g:\fcom\fractalcompressorbasic\fractalcompressorbasic\fractalcompressorbasic.cpp(771): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
+g:\fcom\fractalcompressorbasic\fractalcompressorbasic\fractalcompressorbasic.cpp(726): warning C4244: '=': conversion from 'float' to 'byte', possible loss of data
+g:\fcom\fractalcompressorbasic\fractalcompressorbasic\fractalcompressorbasic.cpp(758): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
+g:\fcom\fractalcompressorbasic\fractalcompressorbasic\fractalcompressorbasic.cpp(760): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
+g:\fcom\fractalcompressorbasic\fractalcompressorbasic\fractalcompressorbasic.cpp(762): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
+g:\fcom\fractalcompressorbasic\fractalcompressorbasic\fractalcompressorbasic.cpp(764): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
+g:\fcom\fractalcompressorbasic\fractalcompressorbasic\fractalcompressorbasic.cpp(766): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
+g:\fcom\fractalcompressorbasic\fractalcompressorbasic\fractalcompressorbasic.cpp(768): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
+g:\fcom\fractalcompressorbasic\fractalcompressorbasic\fractalcompressorbasic.cpp(770): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
+g:\fcom\fractalcompressorbasic\fractalcompressorbasic\fractalcompressorbasic.cpp(772): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
   FractalCompressorBasic.vcxproj -> G:\fcom\FractalCompressorBasic\Debug\FractalCompressorBasic.exe
   FractalCompressorBasic.vcxproj -> G:\fcom\FractalCompressorBasic\Debug\FractalCompressorBasic.pdb (Partial PDB)

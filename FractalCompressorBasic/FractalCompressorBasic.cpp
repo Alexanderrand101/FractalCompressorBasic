@@ -370,11 +370,12 @@ double difference(byte** block, byte**  pixels, int offsetX, int offsetY, int n)
 	double difference = 0;
 	float brightDiffValue = 0;
 	float contrastCoefficient = 0;
+	calcCoeffs(block, pixels, offsetX, offsetY, n, &brightDiffValue, &contrastCoefficient);
 	for (int i = 0; i < n; i++)
 	{
 		for (int j = 0; j < n; j++)
 		{
-			difference += pow(block[i][j] - pixels[offsetY + i][offsetX + j], 2);
+			difference += pow(block[i][j] * contrastCoefficient + brightDiffValue - pixels[offsetY + i][offsetX + j], 2);
 		}
 	}
 	return difference;
@@ -805,7 +806,7 @@ int main()
 	iheader = (BITMAPINFOHEADER*)malloc(sizeof(BITMAPINFOHEADER));
 	byte** pixels = nullptr;
 	byte*** reftopixels = &pixels;
-	LoadPixels("t3.bmp", reftopixels, fheader, iheader);
+	LoadPixels("glss.bmp", reftopixels, fheader, iheader);
 	byte **blue, **red, **green;
 	blue = (byte**)malloc(sizeof(byte*) * iheader->biHeight);
 	red = (byte**)malloc(sizeof(byte*) * iheader->biHeight);
